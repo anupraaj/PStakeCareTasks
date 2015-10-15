@@ -1,0 +1,117 @@
+<!DOCTYPE html> 
+<html ng-app="myApp" ng-controller="myCtrl"> 
+    <head>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.4.7/angular.min.js" type="text/javascript"></script>
+    </head>
+	
+    <body>
+	
+		<input type="text" ng-model="timing_json"><br />
+		<button ng-click="process()">Process</button><br /><br /><br />
+	
+		{{result}}
+		<script>
+		
+			var app = angular.module("myApp", []);
+			
+			
+			app.controller('myCtrl', function($scope,process_timing) 
+			{
+				$scope.process = function()
+				{
+					$scope.result = process_timing($scope.timing_json);
+				}
+			});
+			
+			
+			/* -------------------------- READ AT YOUR OWN RISK ;-) -------------------------- */
+		
+			app.factory('process_timing', function() 
+			{
+				var days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+				
+			
+				var tConvert = function(time) 
+				{
+					time = time.toString().match(/.{1,2}/g);
+					
+					if (time.length > 1) 
+					{ 
+					  var a = +time[0] < 12 ? 'AM' : 'PM';
+					  time[0] = +time[0] % 12 || 12;
+					}
+					return (time.join (':') + ' ' + a); 
+				}
+								
+				var process_slot = function(slot)
+				{
+					if(slot.from == 0 && slot.to == 2359 )
+					{
+						is_24x7 = true;
+						return "24x7";
+					}
+						
+					
+					var result = tConvert(slot.from) + " to " + tConvert(slot.to);
+					
+					return result;
+				}
+				
+				return function(timing_json)
+				{
+					var timing_obj = angular.fromJson(timing_json);
+					var except = [];
+					var day_index = 0;
+					var is_24x7 = false;
+					var result = '';
+					var unique_slots = [];
+				
+					for (var day in timing_obj) 
+					{
+					  if (timing_obj.hasOwnProperty(day)) 
+					  {
+						
+						if(timing_obj[day].length > 0)
+						{
+							var slots = timing_obj[day];
+							
+							for (var i = 0; (i < slots.length) && (!is_24x7); i++) 
+							{ 
+								slot = process_slot(slots[i]);
+								
+								if(unique_slots.indexOf(slot) == -1)
+								{
+									unique_slots.push(slot);
+								}
+							}
+						}
+						else
+						{
+							except.push(days[day_index]);
+						}
+						
+					  }
+					  
+					  day_index ++;
+					}
+					
+					if(is_24x7)
+						result += '24x7';
+					else
+						result += unique_slots.join(', ');	
+					
+					if(except.length > 0)
+						result += ' except ' + except.join(' and ');
+						
+					console.log(result);
+					return result;
+				}
+				
+				
+			
+			});
+			
+		</script>
+
+    </body>
+</html>
