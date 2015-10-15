@@ -24,7 +24,8 @@ Sample output2:
 
 
 
-```Sample input3:
+```
+Sample input3:
 {"sun":[],"mon":[{"from":930,"to":1330},{"from":1700,"to":2100}],"tue":[{"from":930,"to":1330},{"from":1700,"to":2100}],"wed":[{"from":930,"to":1330},{"from":1700,"to":2100}],"thu":[{"from":930,"to":1330},{"from":1700,"to":2100}],"fri":[{"from":930,"to":1330},{"from":1700,"to":2100}],"sat":[{"from":930,"to":1330},{"from":1700,"to":2100}]}
 
 Sample output3:
